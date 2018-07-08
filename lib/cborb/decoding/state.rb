@@ -1,5 +1,7 @@
 module Cborb::Decoding
   class State
+    CONTINUE = Object.new
+
     attr_reader :result
 
     # @param [String] initial_cbor
@@ -51,7 +53,9 @@ module Cborb::Decoding
         stacked_type, im_data = @stack.last
         ret = stacked_type.accept(im_data, type, value)
 
-        if ret
+        if ret.equal?(CONTINUE)
+          break
+        else
           @stack.pop
           if @stack.empty?
             @result = ret
@@ -59,8 +63,6 @@ module Cborb::Decoding
           else
             value = ret
           end
-        else
-          break
         end
       end
     end

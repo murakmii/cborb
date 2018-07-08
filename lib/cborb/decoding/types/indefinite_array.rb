@@ -16,7 +16,7 @@ module Cborb::Decoding::Types
         im_data
       else
         im_data << value
-        nil
+        Cborb::Decoding::State::CONTINUE
       end
     end
   end

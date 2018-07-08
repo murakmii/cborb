@@ -14,7 +14,7 @@ module Cborb::Decoding::Types
     def self.accept_value(im_data, type, value)
       if type == Cborb::Decoding::Types::ByteString
         im_data.concat(value)
-        nil
+        Cborb::Decoding::State::CONTINUE
       elsif type == Cborb::Decoding::Types::Break
         im_data
       else

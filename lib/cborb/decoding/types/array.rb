@@ -14,7 +14,7 @@ module Cborb::Decoding::Types
 
     def self.accept(im_data, type, value)
       im_data.array << value
-      im_data.size == im_data.array.size ? im_data.array : nil
+      im_data.size == im_data.array.size ? im_data.array : Cborb::Decoding::State::CONTINUE
     end
   end
 end

@@ -17,7 +17,7 @@ module Cborb::Decoding::Types
       if im_data.map.size / 2 == im_data.size
         Hash[im_data.map]
       else
-        nil
+        Cborb::Decoding::State::CONTINUE
       end
     end
   end

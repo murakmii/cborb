@@ -17,7 +17,7 @@ module Cborb::Decoding::Types
         Hash[im_data]
       else
         im_data << value
-        nil
+        Cborb::Decoding::State::CONTINUE
       end
     end
   end
