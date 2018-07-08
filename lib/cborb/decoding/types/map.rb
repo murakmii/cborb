@@ -15,7 +15,7 @@ module Cborb::Decoding::Types
     def self.accept(im_data, type, value)
       im_data.map << value
       if im_data.map.size / 2 == im_data.size
-        Hash[im_data.map]
+        Hash[*im_data.map]
       else
         Cborb::Decoding::State::CONTINUE
       end
