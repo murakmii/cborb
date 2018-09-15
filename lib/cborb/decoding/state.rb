@@ -4,40 +4,53 @@ module Cborb::Decoding
 
     attr_reader :result
 
-    # @param [String] initial_cbor
-    # @param [Hash] opts
-    def initialize(initial_cbor, opts, &block)
-      @buffer = Cborb::Decoding::Buffer.new(initial_cbor)
-      @opts = opts
+    def initialize(&block)
+      @buffer = StringIO.new
       @stack = [[Cborb::Decoding::Types::Root, nil]]
-      @requested_buffer_size = 0
+      @decoding_fiber = Fiber.new { block.call(self) }
       @result = nil
-
-      @process_fiber = Fiber.new { block.call(self) }
-      @process_fiber.resume
     end
 
+    # Buffering new CBOR data
+    #
     # @param [String] cbor
-    def produce(cbor)
-      raise Cborb::DecodingError, "Not streaming mode" unless @opts[:streaming]
-
+    def <<(cbor)
+      pos = @buffer.pos
       @buffer.write(cbor)
-      if @requested_buffer_size > 0 && @requested_buffer_size <= @buffer.size
-        @process_fiber.resume
+      @buffer.pos = pos
+
+      @decoding_fiber.resume
+
+    rescue FiberError => e
+      msg = e.message
+
+      if msg.include?("dead")
+        raise Cborb::InvalidByteSequenceError
+      elsif msg.include?("threads")
+        raise Cborb::DecodingError, "Can't decode across threads"
+      else
+        raise
       end
     end
 
-    # @param [Integer] size
+    # Consume CBOR data.
+    # This method will be called only in fiber.
+    #
+    # @param [Integer] size Size to consume
     def consume(size)
-      if @buffer.size < size
-        raise Cborb::DecodingError, "Insufficiency" unless @opts[:streaming]
+      data = @buffer.read(size).to_s
 
-        @requested_buffer_size = size
-        Fiber.yield
-        @requested_buffer_size = 0
+      # If buffered data is not enought, yield fiber until new data will be buffered.
+      if data.size < size
+        @buffer = StringIO.new # drop whole buffer that was consumed
+
+        while data.size != size
+          Fiber.yield
+          data += @buffer.read(size - data.size)
+        end
       end
 
-      @buffer.read(size)
+      data
     end
 
     # @param [Class] type
@@ -72,12 +85,7 @@ module Cborb::Decoding
     end
 
     def finished?
-      if @stack.empty?
-        raise Cborb::DecodingError, "Invalid extra data" unless @buffer.empty?
-        true
-      else
-        false
-      end
+      !@result.nil?
     end
   end
 end

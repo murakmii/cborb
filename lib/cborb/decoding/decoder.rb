@@ -2,11 +2,11 @@ module Cborb::Decoding
   class Decoder
     extend Forwardable
 
-    def_delegator :@state, :result
+    def_delegators :@state, :result, :finished?
 
     # IB = Initial Byte
     # @see https://tools.ietf.org/html/rfc7049#appendix-B
-    IB_JUMP_TABLE = 
+    IB_JUMP_TABLE =
       Array.new(0xFF) do |ib|
         case ib
         when 0x00..0x1B
@@ -44,18 +44,12 @@ module Cborb::Decoding
         end
       end.freeze
 
-    def initialize(opts = {})
-      @state = nil
-      @opts = opts
+    def initialize
+      @state = Cborb::Decoding::State.new { |state| process(state) }
     end
 
-    def decode(initial_cbor)
-      raise Cborb::Error, "Decoder already started" if @state
-
-      @state = 
-        Cborb::Decoding::State.new(initial_cbor, @opts) do |state|
-          process(state)
-        end
+    def decode(cbor)
+      @state << cbor.to_s
     end
 
     private

@@ -24,16 +24,23 @@ require "cborb/decoding/types/half_precision_floating_point"
 require "cborb/decoding/types/floating_point"
 require "cborb/decoding/types/break"
 
-require "cborb/decoding/buffer"
 require "cborb/decoding/state"
 require "cborb/decoding/decoder"
 
 module Cborb
+  # The shorthand to decode CBOR
+  #
   # @param [String] cbor
+  # @return [Object] decoded data(Array, Hash, etc...)
   def decode(cbor)
-    decoder = Decoding::Decoder.new(streaming: false)
+    decoder = Decoding::Decoder.new
     decoder.decode(cbor)
-    decoder.result
+
+    if decoder.finished?
+      decoder.result
+    else
+      raise Cborb::InvalidByteSequenceError
+    end
   end
 
   module_function :decode
