@@ -1,14 +1,19 @@
 module Cborb::Decoding
+  # State of processing to decode
   class State
     CONTINUE = Object.new
 
     attr_reader :result
 
-    def initialize(&block)
+    def initialize
       @buffer = StringIO.new
       @stack = [[Cborb::Decoding::Types::Root, nil]]
-      @decoding_fiber = Fiber.new { block.call(self) }
       @result = nil
+
+      # This fiber decodes CBOR.
+      # If buffer becomes empty, this fiber is stopped(#consume)
+      # When new CBOR data is buffered(#<<), that is resumed.
+      @decoding_fiber = Fiber.new { loop_consuming }
     end
 
     # Buffering new CBOR data
@@ -24,6 +29,7 @@ module Cborb::Decoding
     rescue FiberError => e
       msg = e.message
 
+      # umm...
       if msg.include?("dead")
         raise Cborb::InvalidByteSequenceError
       elsif msg.include?("threads")
@@ -53,13 +59,15 @@ module Cborb::Decoding
       data
     end
 
-    # @param [Class] type
-    # @param [Object] im_data
+    # Push type that has following data(e.g. Array) to stack
+    #
+    # @param [Class] type Class constant that inherits Cborb::Decoding::Types::Type
+    # @param [Object] im_data depends on type
     def push_stack(type, im_data = nil)
       @stack << [type, im_data]
     end
 
-    # @param [Class] type
+    # @param [Class] type Class constant that inherits Cborb::Decoding::Types::Type
     # @param [Object] value
     def accept_value(type, value)
       loop do
@@ -81,12 +89,24 @@ module Cborb::Decoding
       end
     end
 
+    # @return [Class] Class constant that inherits Cborb::Decoding::Types::Type on top of stack.
     def stack_top
       @stack.last.first
     end
 
+    # @return [Boolean]
     def finished?
       !@result.nil?
+    end
+
+    private
+
+    def loop_consuming
+      loop do
+        ib = consume(1).ord
+        Cborb::Decoding::IB_JUMP_TABLE[ib].decode(self, ib & 0x1F)
+        break if finished?
+      end
     end
   end
 end

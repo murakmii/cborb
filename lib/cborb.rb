@@ -24,6 +24,7 @@ require "cborb/decoding/types/half_precision_floating_point"
 require "cborb/decoding/types/floating_point"
 require "cborb/decoding/types/break"
 
+require "cborb/decoding/ib_jump_table"
 require "cborb/decoding/state"
 require "cborb/decoding/decoder"
 
