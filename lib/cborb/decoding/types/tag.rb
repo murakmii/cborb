@@ -6,13 +6,12 @@ module Cborb::Decoding::Types
     extend Cborb::Decoding::Types::IntegerDecodable
 
     def self.decode(state, additional_info)
-      consume_as_integer(state, additional_info)
-      state.push_stack(self)
+      state.push_stack(self, consume_as_integer(state, additional_info))
     end
 
-    def self.accept(im_data, value)
-      # TODO: implementation
-      value
+    def self.accept(im_data, type, value)
+      # Currently, decoder doesn't interpret a tag.
+      Cborb::Decoding::TaggedValue.new(im_data, value)
     end
   end
 end
