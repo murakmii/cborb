@@ -71,6 +71,7 @@ module Cborb::Decoding
         else
           @stack.pop
           if @stack.empty?
+            raise Cborb::InvalidByteSequenceError unless @buffer.eof?
             @result = ret
             break
           else
