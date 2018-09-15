@@ -11,5 +11,9 @@ module Cborb::Decoding
     def decode(cbor)
       @state << cbor.to_s
     end
+
+    def inspect
+      "#<#{self.class}:#{object_id} finished=#{finished?} result=#{finished? ? result : "nil"}>"
+    end
   end
 end
