@@ -11,7 +11,7 @@ module Cborb::Decoding::Types
       state.push_stack(self, [])
     end
 
-    def self.accept_value(im_data, type, value)
+    def self.accept(im_data, type, value)
       if type == Cborb::Decoding::Types::Break
         im_data
       else

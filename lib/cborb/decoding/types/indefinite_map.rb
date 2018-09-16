@@ -14,7 +14,7 @@ module Cborb::Decoding::Types
     def self.accept(im_data, type, value)
       if type == Cborb::Decoding::Types::Break
         raise Cborb::DecodingError, "Invalid indefinite-length map" if im_data.size.odd?
-        Hash[im_data]
+        Hash[*im_data]
       else
         im_data << value
         Cborb::Decoding::State::CONTINUE

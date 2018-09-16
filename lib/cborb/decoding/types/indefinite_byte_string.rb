@@ -11,7 +11,7 @@ module Cborb::Decoding::Types
       state.push_stack(self, String.new.force_encoding(::Encoding::ASCII_8BIT))
     end
 
-    def self.accept_value(im_data, type, value)
+    def self.accept(im_data, type, value)
       if type == Cborb::Decoding::Types::ByteString
         im_data.concat(value)
         Cborb::Decoding::State::CONTINUE

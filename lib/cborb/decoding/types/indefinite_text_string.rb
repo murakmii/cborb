@@ -11,14 +11,14 @@ module Cborb::Decoding::Types
       state.push_stack(self, String.new.force_encoding(::Encoding::UTF_8))
     end
 
-    def self.accept_value(im_data, type, value)
+    def self.accept(im_data, type, value)
       if type == Cborb::Decoding::Types::TextString
         im_data.concat(value)
         Cborb::Decoding::State::CONTINUE
       elsif type == Cborb::Decoding::Types::Break
         im_data
       else
-        raise Cborb::DecodingError, "Unexpected chunk for indefinite byte string" 
+        raise Cborb::DecodingError, "Unexpected chunk for indefinite text string"
       end
     end
   end
