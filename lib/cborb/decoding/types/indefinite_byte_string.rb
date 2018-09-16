@@ -18,7 +18,7 @@ module Cborb::Decoding::Types
       elsif type == Cborb::Decoding::Types::Break
         im_data
       else
-        raise Cborb::DecodingError, "Unexpected chunk for indefinite byte string" 
+        raise Cborb::DecodingError, "Unexpected chunk for indefinite byte string"
       end
     end
   end
