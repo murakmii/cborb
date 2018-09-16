@@ -6,7 +6,7 @@ module Cborb::Decoding
     attr_reader :result
 
     def initialize
-      @buffer = StringIO.new
+      @buffer = Cborb::Decoding::SimpleBuffer.new
       @stack = [[Cborb::Decoding::Types::Root, nil]]
       @result = nil
 
@@ -20,10 +20,7 @@ module Cborb::Decoding
     #
     # @param [String] cbor
     def <<(cbor)
-      pos = @buffer.pos
       @buffer.write(cbor)
-      @buffer.pos = pos
-
       @decoding_fiber.resume
 
     rescue FiberError => e
@@ -48,7 +45,7 @@ module Cborb::Decoding
 
       # If buffered data is not enought, yield fiber until new data will be buffered.
       if data.size < size
-        @buffer = StringIO.new # drop whole buffer that was consumed
+        @buffer.reset!
 
         while data.size != size
           Fiber.yield
