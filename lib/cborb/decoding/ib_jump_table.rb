@@ -26,8 +26,12 @@ module Cborb::Decoding
         Types::IndefiniteMap
       when 0xC0..0xDB
         Types::Tag
+      when 0xE0..0xF3
+        Types::UnassignedSimpleValue
       when 0xF4..0xF7
         Types::SimpleValue
+      when 0xF8
+        Types::UnassignedSimpleValue
       when 0xF9
         Types::HalfPrecisionFloatingPoint
       when 0xFA, 0xFB
