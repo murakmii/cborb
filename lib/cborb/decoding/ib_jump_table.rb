@@ -2,7 +2,7 @@ module Cborb::Decoding
   # IB = Initial Byte
   # @see https://tools.ietf.org/html/rfc7049#appendix-B
   IB_JUMP_TABLE =
-    Array.new(0xFF) do |ib|
+    Array.new(256) do |ib|
       case ib
       when 0x00..0x1B
         Types::Integer
@@ -36,6 +36,8 @@ module Cborb::Decoding
         Types::HalfPrecisionFloatingPoint
       when 0xFA, 0xFB
         Types::FloatingPoint
+      when 0xFC..0xFE
+        Types::UnassignedSimpleValue
       when 0xFF
         Types::Break
       else
