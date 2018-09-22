@@ -23,6 +23,10 @@ jobs:
             - ./vendor/bundle
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}
 
+      - run:
+          name: generate fixtures
+          command: bin/generate_fixtures
+
       # run tests!
       - run:
           name: run specs
