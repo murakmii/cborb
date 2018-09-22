@@ -31,7 +31,7 @@ Cborb.decode("\x9F\x01\x82\x02\x03\x9F\x04\x05\xFF\xFF") # => [1, [2, 3], [4, 5]
 
 ## Handling tags
 
-If Cborb encounters a tag, generates instance of `Cborb::Decoding::TaggedValue`.
+If Cborb encounters a tag, generates instance of `Cborb::Decoding::TaggedValue`.  
 That contains tag number and original value.
 
 ```rb
@@ -54,7 +54,7 @@ So, Cborb converts "undefined" to `nil`.
 Cborb.decode "\xF7" # => nil
 ```
 
-If Cborb encounters unassigned simple value, generates instance of `Cborb::Decoding::UnassignedSimpleValue`.
+If Cborb encounters unassigned simple value, generates instance of `Cborb::Decoding::UnassignedSimpleValue`.  
 That contains simple value number.
 
 ```rb

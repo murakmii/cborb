@@ -16,6 +16,14 @@ module Cborb::Decoding
       @buffer.pos = pos
     end
 
+    def read(bytes)
+      if bytes == 1
+        @buffer.getc
+      else
+        @buffer.read(bytes)
+      end
+    end
+
     def reset!
       @buffer.rewind
       @buffer.truncate(0)

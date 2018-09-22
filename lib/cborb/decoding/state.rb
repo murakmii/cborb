@@ -71,7 +71,7 @@ module Cborb::Decoding
         value = stacked_type.accept(im_data, type, value)
         type = stacked_type
 
-        if value.equal?(CONTINUE)
+        if value.eql?(CONTINUE)
           break
         else
           @stack.pop
@@ -102,10 +102,9 @@ module Cborb::Decoding
     private
 
     def loop_consuming
-      loop do
+      until finished? do
         ib = consume(1).ord
         Cborb::Decoding::IB_JUMP_TABLE[ib].decode(self, ib & 0x1F)
-        break if finished?
       end
     end
   end
