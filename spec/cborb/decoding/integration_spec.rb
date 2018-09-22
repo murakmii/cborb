@@ -98,6 +98,7 @@ RSpec.describe "Integration" do
           "array(represented by 8 byte integer)" => [1, 2, 3],
           "indefinite array"                     => [1, 2, 3, "hello"]
         },
+        Cborb::Decoding::TaggedValue.new(0, "1970-01-01T00:00Z"),
         false,
         true,
         nil,

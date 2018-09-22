@@ -204,6 +204,11 @@ generate "009" do |out|
   out << "\x65" + "hello"
   out << "\xFF"
 
+  # tag
+  out << "\xC0"
+  out << "\x71"
+  out << "1970-01-01T00:00Z"
+
   # simple values
   out << "\xF4\xF5\xF6\xF7"
 
