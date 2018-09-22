@@ -1,0 +1,29 @@
+version: 2
+jobs:
+  rspec:
+    docker:
+       - image: circleci/ruby:2.4.1-node-browsers
+
+    working_directory: ~/cborb
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}
+
+      - run:
+          name: install dependencies
+          command: |
+            bundle install --jobs=4 --retry=3 --path vendor/bundle
+
+      - save_cache:
+          paths:
+            - ./vendor/bundle
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+
+      # run tests!
+      - run:
+          name: run specs
+          command: bundle exec rspec
