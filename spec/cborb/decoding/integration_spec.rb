@@ -98,7 +98,6 @@ RSpec.describe "Integration" do
           "array(represented by 8 byte integer)" => [1, 2, 3],
           "indefinite array"                     => [1, 2, 3, "hello"]
         },
-        "2018/09/23",
         false,
         true,
         nil,

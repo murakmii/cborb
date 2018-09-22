@@ -11,7 +11,7 @@ module Cborb::Decoding::Types
 
     def self.accept(im_data, type, value)
       # Currently, decoder doesn't interpret a tag.
-      value
+      Cborb::Decoding::TaggedValue.new(im_data, value)
     end
   end
 end
