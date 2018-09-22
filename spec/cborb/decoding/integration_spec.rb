@@ -17,33 +17,21 @@ RSpec.describe "Integration" do
 
   describe "003" do
     it "Raises decoding error" do
-      expect { subject }.to raise_error(Cborb::DecodingError, "Included unassigned simple value: 3")
+      expect { subject }.to raise_error(Cborb::InvalidByteSequenceError)
     end
   end
 
   describe "004" do
     it "Raises decoding error" do
-      expect { subject }.to raise_error(Cborb::DecodingError, "Included unassigned simple value: 255")
+      expect { subject }.to raise_error(Cborb::InvalidByteSequenceError)
     end
   end
 
   describe "005" do
-    it "Raises decoding error" do
-      expect { subject }.to raise_error(Cborb::InvalidByteSequenceError)
-    end
-  end
-
-  describe "006" do
-    it "Raises decoding error" do
-      expect { subject }.to raise_error(Cborb::InvalidByteSequenceError)
-    end
-  end
-
-  describe "007" do
     it { is_expected.to eq [1, 2, 3] }
   end
 
-  describe "008" do
+  describe "006" do
     it "can decode it" do
       result = subject
       100000.times { result = result.first }
@@ -52,7 +40,7 @@ RSpec.describe "Integration" do
     end
   end
 
-  describe "009" do
+  describe "007" do
     it "can decode it" do
       expect(subject).to contain_exactly(
         {
@@ -99,6 +87,10 @@ RSpec.describe "Integration" do
           "indefinite array"                     => [1, 2, 3, "hello"]
         },
         Cborb::Decoding::TaggedValue.new(0, "1970-01-01T00:00Z"),
+        Cborb::Decoding::TaggedValue.new(15, 123),
+        Cborb::Decoding::TaggedValue.new(255, 123),
+        Cborb::Decoding::TaggedValue.new(65535, 123),
+        Cborb::Decoding::TaggedValue.new(4294967295, 123),
         false,
         true,
         nil,
@@ -109,6 +101,8 @@ RSpec.describe "Integration" do
           "single precision float" => be_within(0.00001).of(1.23),
           "double precision float" => 1.23,
         },
+        Cborb::Decoding::UnassignedSimpleValue.new(15),
+        Cborb::Decoding::UnassignedSimpleValue.new(255),
         {
           "abc" => 123,
           "def" => 456
@@ -117,19 +111,19 @@ RSpec.describe "Integration" do
     end
   end
 
-  describe "010" do
+  describe "008" do
     it "Raises decoding error" do
       expect { subject }.to raise_error(Cborb::DecodingError, "Unexpected chunk for indefinite byte string")
     end
   end
 
-  describe "011" do
+  describe "009" do
     it "Raises decoding error" do
       expect { subject }.to raise_error(Cborb::DecodingError, "Unexpected chunk for indefinite text string")
     end
   end
 
-  describe "012" do
+  describe "010" do
     it { is_expected.to be_nil }
   end
 end

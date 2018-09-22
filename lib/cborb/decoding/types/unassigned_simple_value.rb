@@ -7,8 +7,7 @@ module Cborb::Decoding::Types
 
     def self.decode(state, additional_info)
       simple_value = consume_as_integer(state, additional_info)
-
-      raise Cborb::DecodingError, "Included unassigned simple value: #{simple_value}"
+      state.accept_value(self, Cborb::Decoding::UnassignedSimpleValue.new(simple_value))
     end
   end
 end

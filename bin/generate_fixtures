@@ -41,39 +41,29 @@ generate "002" do |out|
   out << "\x83\x01\x1C\x03"
 end
 
-# includes unassigned simple value
-generate "003" do |out|
-  out << "\x83\x01\xE3\x03"
-end
-
-# includes unassigned simple value(extended)
-generate "004" do |out|
-  out << "\x83\x01\xF8\xFF\x03"
-end
-
 # includes unnecessary data
-generate "005" do |out|
+generate "003" do |out|
   out << "\x83\x01\x02\x03\x04"
 end
 
 # lack data
-generate "006" do |out|
+generate "004" do |out|
   out << "\x83\x01\x02"
 end
 
 # correct array
-generate "007" do |out|
+generate "005" do |out|
   out << "\x83\x01\x02\x03"
 end
 
 # 100000 times nested array
-generate "008" do |out|
+generate "006" do |out|
   out << ("\x81" * 100000)
   out << "\x18\x7B" # 123(Integer)
 end
 
 # includes all data
-generate "009" do |out|
+generate "007" do |out|
   out << "\x9F" # start indefinite array
 
   # start map that contains 6 items
@@ -209,6 +199,18 @@ generate "009" do |out|
   out << "\x71"
   out << "1970-01-01T00:00Z"
 
+  out << "\xD8\x0F" # tag: 15
+  out << "\x18\x7B" # 123
+
+  out << "\xD9\x00\xFF" # tag: 255
+  out << "\x18\x7B"
+
+  out << "\xDA\x00\x00\xFF\xFF" # tag: 65535
+  out << "\x18\x7B"
+
+  out << "\xDB\x00\x00\x00\x00\xFF\xFF\xFF\xFF" # tag: 4294967295
+  out << "\x18\x7B"
+
   # simple values
   out << "\xF4\xF5\xF6\xF7"
 
@@ -229,6 +231,10 @@ generate "009" do |out|
   out << "\xFB"
   out << [1.23].pack("G")
 
+  # unassigned simple values
+  out << "\xEF"
+  out << "\xF8\xFF"
+
   # start indefinite-length map
   out << "\xBF"
   out << "\x63" + "abc"
@@ -241,16 +247,16 @@ generate "009" do |out|
 end
 
 # indefinite-length byte string that contains invalid chunk
-generate "010" do |out|
+generate "008" do |out|
   out << "\x5F\x01"
 end
 
 # indefinite-length unicode string that contains invalid chunk
-generate "011" do |out|
+generate "009" do |out|
   out << "\x7F\x01"
 end
 
 # nil only
-generate "012" do |out|
+generate "010" do |out|
   out << "\xF6"
 end

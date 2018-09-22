@@ -27,6 +27,7 @@ require "cborb/decoding/types/break"
 
 require "cborb/decoding/ib_jump_table"
 require "cborb/decoding/tagged_value"
+require "cborb/decoding/unassigned_simple_value"
 require "cborb/decoding/simple_buffer"
 require "cborb/decoding/state"
 require "cborb/decoding/decoder"

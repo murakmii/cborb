@@ -10,8 +10,11 @@ RSpec.describe Cborb::Decoding::Types::UnassignedSimpleValue do
     context "If additional information is lesser than 24" do
       let(:additional_info) { 23 }
 
-      it "Raises error" do
-        expect { subject }.to raise_error(Cborb::DecodingError, "Included unassigned simple value: 23")
+      it "Calls #accept_value with Unassigned Simple Value" do
+        allow(state).to receive(:accept_value)
+        subject
+        expect(state).
+          to have_received(:accept_value).with(described_class, Cborb::Decoding::UnassignedSimpleValue.new(23))
       end
     end
 
@@ -20,8 +23,11 @@ RSpec.describe Cborb::Decoding::Types::UnassignedSimpleValue do
 
       before { allow(state).to receive(:consume).with(1).and_return("\xFF") }
 
-      it "Raises error" do
-        expect { subject }.to raise_error(Cborb::DecodingError, "Included unassigned simple value: 255")
+      it "Calls #accept_value with Unassigned Simple Value" do
+        allow(state).to receive(:accept_value)
+        subject
+        expect(state).
+          to have_received(:accept_value).with(described_class, Cborb::Decoding::UnassignedSimpleValue.new(255))
       end
     end
   end
