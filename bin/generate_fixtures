@@ -1,0 +1,246 @@
+#!/usr/bin/env ruby
+
+def generate(name)
+  path = File.join(File.dirname(__FILE__), "../spec/fixtures/#{name}.cbor")
+  File.open(path, "wb") do |f|
+    yield f
+  end
+end
+
+def generate_definite_string(text, size_byte)
+  text = text.dup.force_encoding(Encoding::ASCII_8BIT)
+  ib = 
+    case size_byte
+    when 0
+      (0b01100000 | text.bytesize).chr
+    when 1
+      "\x78" + [text.bytesize].pack("C")
+    when 2
+      "\x79" + [text.bytesize].pack("S>")
+    when 4
+      "\x7A" + [text.bytesize].pack("I>")
+    when 8
+      "\x7B" + [text.bytesize].pack("Q>")
+    else
+      raise "invalid string size byte: #{size_byte}"
+    end
+
+  ib + text
+end
+
+# NOTE:
+#   0x83 = The initial byte of array that has 3 items
+
+# only unknown initial byte
+generate "001" do |out|
+  out << "\x1C"
+end
+
+# includes unknown initial byte
+generate "002" do |out|
+  out << "\x83\x01\x1C\x03"
+end
+
+# includes unassigned simple value
+generate "003" do |out|
+  out << "\x83\x01\xE3\x03"
+end
+
+# includes unassigned simple value(extended)
+generate "004" do |out|
+  out << "\x83\x01\xF8\xFF\x03"
+end
+
+# includes unnecessary data
+generate "005" do |out|
+  out << "\x83\x01\x02\x03\x04"
+end
+
+# lack data
+generate "006" do |out|
+  out << "\x83\x01\x02"
+end
+
+# correct array
+generate "007" do |out|
+  out << "\x83\x01\x02\x03"
+end
+
+# 100000 times nested array
+generate "008" do |out|
+  out << ("\x81" * 100000)
+  out << "\x18\x7B" # 123(Integer)
+end
+
+# includes all data
+generate "009" do |out|
+  out << "\x9F" # start indefinite array
+
+  # start map that contains 6 items
+  out << "\xA6" 
+
+  out << generate_definite_string("description", 0)
+  out << generate_definite_string("The map that contains positive integers", 1)
+
+  out << generate_definite_string("zero byte integer", 0)
+  out << "\x17" # 23
+
+  out << generate_definite_string("single byte integer", 1)
+  out << "\x18\x0F" # 15
+
+  out << generate_definite_string("2 byte integer", 2)
+  out << "\x19\x00\xFF" # 255
+
+  out << generate_definite_string("4 byte integer", 4)
+  out << "\x1A\x00\x00\xFF\xFF" # 65535
+
+  out << generate_definite_string("8 byte integer", 8)
+  out << "\x1B\x00\x00\x00\x00\xFF\xFF\xFF\xFF" # 4294967295
+
+  # start map that contains 6 items
+  out << "\xB8\x06"
+
+  out << generate_definite_string("description", 0)
+  out << generate_definite_string("The map that contains negative integers", 1)
+
+  out << generate_definite_string("zero byte integer", 0)
+  out << "\x37" # -24
+
+  out << generate_definite_string("single byte integer", 1)
+  out << "\x38\x0F" # -16
+
+  out << generate_definite_string("2 byte integer", 2)
+  out << "\x39\x00\xFF" # -256
+
+  out << generate_definite_string("4 byte integer", 4)
+  out << "\x3A\x00\x00\xFF\xFF" # -65536
+
+  out << generate_definite_string("8 byte integer", 8)
+  out << "\x3B\x00\x00\x00\x00\xFF\xFF\xFF\xFF" # -4294967296
+
+  # start map that contains 7 items
+  out << "\xB9\x00\x07" 
+
+  out << generate_definite_string("description", 0)
+  out << generate_definite_string("The map that contains byte strings", 1)
+
+  out << generate_definite_string("byte string(represented by 0 byte integer)", 1)
+  out << "\x43\x41\x42\x43"
+
+  out << generate_definite_string("byte string(represented by 1 byte integer)", 1)
+  out << "\x58\x03\x41\x42\x43"
+
+  out << generate_definite_string("byte string(represented by 2 byte integer)", 1)
+  out << "\x59\x00\x03\x41\x42\x43"
+
+  out << generate_definite_string("byte string(represented by 4 byte integer)", 1)
+  out << "\x5A\x00\x00\x00\x03\x41\x42\x43"
+
+
+  out << generate_definite_string("byte string(represented by 8 byte integer)", 1)
+  out << "\x5B\x00\x00\x00\x00\x00\x00\x00\x03\x41\x42\x43"
+
+  out << generate_definite_string("indefinite byte string", 1)
+  out << "\x5F"
+  out << "\x41\x41"
+  out << "\x41\x42"
+  out << "\x41\x43"
+  out << "\xFF"
+
+  # start map that contains 7 items
+  out << "\xBA\x00\x00\x00\x07" 
+
+  ustr = "おはよう".force_encoding("ASCII-8BIT") # 12 bytes
+
+  out << generate_definite_string("description", 0)
+  out << generate_definite_string("The map that contains unicode strings", 1)
+
+  out << generate_definite_string("unicode string(represented by 0 byte integer)", 1)
+  out << "\x6C" + ustr
+
+  out << generate_definite_string("unicode string(represented by 1 byte integer)", 1)
+  out << "\x78\x0C" + ustr
+
+  out << generate_definite_string("unicode string(represented by 2 byte integer)", 1)
+  out << "\x79\x00\x0C" + ustr
+
+  out << generate_definite_string("unicode string(represented by 4 byte integer)", 1)
+  out << "\x7A\x00\x00\x00\x0C" + ustr
+
+  out << generate_definite_string("unicode string(represented by 8 byte integer)", 1)
+  out << "\x7B\x00\x00\x00\x00\x00\x00\x00\x0C" + ustr
+
+  out << generate_definite_string("indefinite unicode string", 1)
+  out << "\x7F"
+  out << "\x66" + "おは".force_encoding("ASCII-8BIT")
+  out << "\x66" + "よう".force_encoding("ASCII-8BIT")
+  out << "\x6F" + "ございます".force_encoding("ASCII-8BIT")
+  out << "\xFF"
+
+  # start map that contains 7 items
+  out << "\xBB\x00\x00\x00\x00\x00\x00\x00\x07" 
+
+  out << generate_definite_string("description", 0)
+  out << generate_definite_string("The map that contains arrays", 1)
+
+  out << generate_definite_string("array(represented by 0 byte integer)", 1)
+  out << "\x83\x01\x02\x03" # [1, 2, 3]
+
+  out << generate_definite_string("array(represented by 1 byte integer)", 1)
+  out << "\x98\x03\x01\x02\x03"
+
+  out << generate_definite_string("array(represented by 2 byte integer)", 1)
+  out << "\x99\x00\x03\x01\x02\x03"
+
+  out << generate_definite_string("array(represented by 4 byte integer)", 1)
+  out << "\x9A\x00\x00\x00\x03\x01\x02\x03"
+
+  out << generate_definite_string("array(represented by 8 byte integer)", 1)
+  out << "\x9B\x00\x00\x00\x00\x00\x00\x00\x03\x01\x02\x03" # [1, 2, 3]
+
+  out << generate_definite_string("indefinite array", 1)
+  out << "\x9F"
+  out << "\x01\x02\x03"
+  out << "\x65" + "hello"
+  out << "\xFF"
+
+  # simple values
+  out << "\xF4\xF5\xF6\xF7"
+
+  # start map that contains 4 items
+  out << "\xA4" 
+
+  out << generate_definite_string("description", 0)
+  out << generate_definite_string("The map that contains floating point values", 1)
+
+  out << generate_definite_string("half precision float", 1)
+  out << "\xF9\x35\x55"
+
+  out << generate_definite_string("single precision float", 1)
+  out << "\xFA"
+  out << [1.23].pack("g")
+
+  out << generate_definite_string("double precision float", 1)
+  out << "\xFB"
+  out << [1.23].pack("G")
+
+  # start indefinite-length map
+  out << "\xBF"
+  out << "\x63" + "abc"
+  out << "\x18\x7B"
+  out << "\x63" + "def"
+  out << "\x19\x01\xC8"
+  out << "\xFF"
+
+  out << "\xFF" # enf of indefinite array
+end
+
+# indefinite-length byte string that contains invalid chunk
+generate "010" do |out|
+  out << "\x5F\x01"
+end
+
+# indefinite-length unicode string that contains invalid chunk
+generate "011" do |out|
+  out << "\x7F\x01"
+end
