@@ -69,18 +69,17 @@ module Cborb::Decoding
     def accept_value(type, value)
       loop do
         stacked_type, im_data = @stack.last
-        ret = stacked_type.accept(im_data, type, value)
+        value = stacked_type.accept(im_data, type, value)
+        type = stacked_type
 
-        if ret.equal?(CONTINUE)
+        if value.equal?(CONTINUE)
           break
         else
           @stack.pop
           if @stack.empty?
             raise Cborb::InvalidByteSequenceError unless @buffer.eof?
-            @result = ret
+            @result = value
             break
-          else
-            value = ret
           end
         end
       end
