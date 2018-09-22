@@ -244,3 +244,8 @@ end
 generate "011" do |out|
   out << "\x7F\x01"
 end
+
+# nil only
+generate "012" do |out|
+  out << "\xF6"
+end

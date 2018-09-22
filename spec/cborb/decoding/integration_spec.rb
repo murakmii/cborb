@@ -127,4 +127,8 @@ RSpec.describe "Integration" do
       expect { subject }.to raise_error(Cborb::DecodingError, "Unexpected chunk for indefinite text string")
     end
   end
+
+  describe "012" do
+    it { is_expected.to be_nil }
+  end
 end

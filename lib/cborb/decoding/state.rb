@@ -2,13 +2,12 @@ module Cborb::Decoding
   # State of processing to decode
   class State
     CONTINUE = Object.new
-
-    attr_reader :result
+    NO_RESULT = Object.new
 
     def initialize
       @buffer = Cborb::Decoding::SimpleBuffer.new
       @stack = [[Cborb::Decoding::Types::Root, nil]]
-      @result = nil
+      @result = NO_RESULT
 
       # This fiber decodes CBOR.
       # If buffer becomes empty, this fiber is stopped(#consume)
@@ -92,7 +91,12 @@ module Cborb::Decoding
 
     # @return [Boolean]
     def finished?
-      !@result.nil?
+      !@result.eql?(NO_RESULT)
+    end
+
+    # @return [Object]
+    def result
+      finished? ? @result : nil
     end
 
     private
