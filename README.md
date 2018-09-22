@@ -1,5 +1,7 @@
 # Cborb
 
+[![CircleCI](https://circleci.com/gh/murakmii/cborb/tree/master.svg?style=svg)](https://circleci.com/gh/murakmii/cborb/tree/master)
+
 Cborb is a pure ruby decoder for CBOR([RFC 7049](https://tools.ietf.org/html/rfc7049))
 
 ```rb
