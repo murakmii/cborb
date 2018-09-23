@@ -1,5 +1,6 @@
 # Cborb
 
+[![Gem Version](https://badge.fury.io/rb/cborb.svg)](https://badge.fury.io/rb/cborb)
 [![CircleCI](https://circleci.com/gh/murakmii/cborb/tree/master.svg?style=svg)](https://circleci.com/gh/murakmii/cborb/tree/master)
 
 Cborb is a pure ruby decoder for CBOR([RFC 7049](https://tools.ietf.org/html/rfc7049))
@@ -61,3 +62,22 @@ That contains simple value number.
 Cborb.decode "\xEF"
 # => #<struct Cborb::Decoding::UnassignedSimpleValue number=15>
 ```
+
+# Development
+
+```bash
+# Clone
+git clone git@github.com:murakmii/cborb && cd cborb
+
+# Setup
+bin/setup
+
+# Edit code...
+
+# Run test
+bundle exec rspec
+```
+
+# Contribution
+
+Contributions are always welcome :kissing_heart:
