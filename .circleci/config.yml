@@ -14,20 +14,14 @@ jobs:
           - v1-dependencies-{{ checksum "Gemfile.lock" }}
 
       - run:
-          name: install dependencies
-          command: |
-            bundle install --jobs=4 --retry=3 --path vendor/bundle
+          name: setup
+          command: bin/setup
 
       - save_cache:
           paths:
             - ./vendor/bundle
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}
 
-      - run:
-          name: generate fixtures
-          command: bin/generate_fixtures
-
-      # run tests!
       - run:
           name: run specs
           command: bundle exec rspec
