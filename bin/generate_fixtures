@@ -260,3 +260,23 @@ end
 generate "010" do |out|
   out << "\xF6"
 end
+
+# lack data(value of map)
+generate "011" do |out|
+  out << "\xA2"
+
+  out << generate_definite_string("abc", 0)
+  out << "\x18\x7B"
+
+  out << generate_definite_string("def", 0)
+end
+
+# big array
+generate "012" do |out|
+  out << "\x9B\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
+end
+
+# big map
+generate "013" do |out|
+  out << "\xBB\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
+end

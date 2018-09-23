@@ -126,4 +126,22 @@ RSpec.describe "Integration" do
   describe "010" do
     it { is_expected.to be_nil }
   end
+
+  describe "011" do
+    it "Raises decoding error" do
+      expect { subject }.to raise_error(Cborb::InvalidByteSequenceError)
+    end
+  end
+
+  describe "012" do
+    it "Raises decoding error" do
+      expect { subject }.to raise_error(Cborb::InvalidByteSequenceError)
+    end
+  end
+
+  describe "013" do
+    it "Raises decoding error" do
+      expect { subject }.to raise_error(Cborb::InvalidByteSequenceError)
+    end
+  end
 end
