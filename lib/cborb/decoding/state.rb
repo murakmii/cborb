@@ -39,6 +39,7 @@ module Cborb::Decoding
     # This method will be called only in fiber.
     #
     # @param [Integer] size Size to consume
+    # @return [String]
     def consume(size)
       data = @buffer.read(size).to_s
 
@@ -53,6 +54,24 @@ module Cborb::Decoding
       end
 
       data
+    end
+
+    # Consume 1 byte(uses #getbyte instead of #read)
+    #
+    # @return [Integer]
+    def consume_byte
+      ib = @buffer.getbyte
+
+      if ib.nil?
+        @buffer.reset!
+
+        while ib.nil?
+          Fiber.yield
+          ib = @buffer.getbyte
+        end
+      end
+
+      ib
     end
 
     # Push type that has following data(e.g. Array) to stack
@@ -103,7 +122,7 @@ module Cborb::Decoding
 
     def loop_consuming
       until finished? do
-        ib = consume(1).ord
+        ib = consume_byte
         Cborb::Decoding::IB_JUMP_TABLE[ib].decode(self, ib & 0x1F)
       end
     end
