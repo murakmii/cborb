@@ -95,7 +95,6 @@ module Cborb::Decoding
         else
           @stack.pop
           if @stack.empty?
-            raise Cborb::InvalidByteSequenceError unless @buffer.eof?
             @result = value
             break
           end
@@ -116,6 +115,11 @@ module Cborb::Decoding
     # @return [Object]
     def result
       finished? ? @result : nil
+    end
+
+    # @return [String]
+    def remaining_bytes
+      finished? ? @buffer.read.to_s : ""
     end
 
     private

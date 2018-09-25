@@ -41,7 +41,7 @@ module Cborb
     decoder = Decoding::Decoder.new
     decoder.decode(cbor)
 
-    if decoder.finished?
+    if decoder.finished? && decoder.remaining_bytes.empty?
       decoder.result
     else
       raise Cborb::InvalidByteSequenceError

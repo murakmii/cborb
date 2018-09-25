@@ -2,7 +2,7 @@ module Cborb::Decoding
   class Decoder
     extend Forwardable
 
-    def_delegators :@state, :result, :finished?
+    def_delegators :@state, :result, :finished?, :remaining_bytes
 
     def initialize
       @state = Cborb::Decoding::State.new
