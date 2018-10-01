@@ -64,7 +64,26 @@ Cborb.decode "\xEF"
 # => #<struct Cborb::Decoding::UnassignedSimpleValue number=15>
 ```
 
-# Development
+## Handling concatenated CBOR
+
+By default, when decoder received concatenated CBOR, that raises error.
+
+```rb
+Cborb.decode("\x83\x01\x02\x03\x04") # => Cborb::InvalidByteSequenceError
+```
+
+If you want to decode concatenated CBOR, set `concatenated` option to `true`.
+Decoder decodes whole of concatenated CBOR and returns instance of `Cborb::Decoding::Concatenated`.
+
+```rb
+results = Cborb.decode("\x83\x01\x02\x03\x04", concatenated: true)
+# => #<Cborb::Decoding::Concatenated:0x00007fcb1b8b2e30 @decoded=[[1, 2, 3], 4]>
+
+results.first # => [1, 2, 3]
+results.last  # => 4
+```
+
+## Development
 
 ```bash
 # Clone
@@ -79,6 +98,6 @@ bin/setup
 bundle exec rspec
 ```
 
-# Contribution
+## Contribution
 
 Contributions are always welcome :kissing_heart:
