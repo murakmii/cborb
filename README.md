@@ -72,7 +72,7 @@ By default, when decoder received concatenated CBOR, that raises error.
 Cborb.decode("\x83\x01\x02\x03\x04") # => Cborb::InvalidByteSequenceError
 ```
 
-If you want to decode concatenated CBOR, set `concatenated` option to `true`.
+If you want to decode concatenated CBOR, set `concatenated` option to `true`.  
 Decoder decodes whole of concatenated CBOR and returns instance of `Cborb::Decoding::Concatenated`.
 
 ```rb
