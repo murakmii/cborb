@@ -119,7 +119,11 @@ module Cborb::Decoding
 
     # @return [String]
     def remaining_bytes
-      finished? ? @buffer.read.to_s : ""
+      if finished?
+        @buffer.peek
+      else
+        ""
+      end
     end
 
     private

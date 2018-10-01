@@ -25,6 +25,7 @@ require "cborb/decoding/types/half_precision_floating_point"
 require "cborb/decoding/types/floating_point"
 require "cborb/decoding/types/break"
 
+require "cborb/decoding/concatenated"
 require "cborb/decoding/ib_jump_table"
 require "cborb/decoding/tagged_value"
 require "cborb/decoding/unassigned_simple_value"
@@ -36,16 +37,29 @@ module Cborb
   # The shorthand to decode CBOR
   #
   # @param [String] cbor
+  # @param [Boolean] concatenated Whether "cbor" param is constructed by concatenated CBOR byte string.
+  #                               If it's true, this method returns instance of Cborb::Decoding::Concatenated
   # @return [Object] decoded data(Array, Hash, etc...)
-  def decode(cbor)
-    decoder = Decoding::Decoder.new
-    decoder.decode(cbor)
+  def decode(cbor, concatenated: false)
+    results = Decoding::Concatenated.new
+    loop do
+      decoder = Decoding::Decoder.new
+      decoder.decode(cbor)
 
-    if decoder.finished? && decoder.remaining_bytes.empty?
-      decoder.result
-    else
-      raise Cborb::InvalidByteSequenceError
+      raise Cborb::InvalidByteSequenceError unless decoder.finished?
+
+      results << decoder.result
+
+      if decoder.remaining_bytes.empty?
+        break
+      elsif !concatenated
+        raise Cborb::InvalidByteSequenceError
+      end
+
+      cbor = decoder.remaining_bytes
     end
+
+    concatenated ? results : results.first
   end
 
   module_function :decode

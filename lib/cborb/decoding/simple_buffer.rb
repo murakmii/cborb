@@ -20,5 +20,10 @@ module Cborb::Decoding
       @buffer.rewind
       @buffer.truncate(0)
     end
+
+    def peek
+      pos = @buffer.pos
+      @buffer.read.to_s.tap { @buffer.pos = pos }
+    end
   end
 end
