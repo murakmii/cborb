@@ -8,8 +8,13 @@ module Cborb::Decoding::Types
     Intermediate = Struct.new(:size, :array)
 
     def self.decode(state, additional_info)
-      im = Intermediate.new(consume_as_integer(state, additional_info), [])
-      state.push_stack(self, im)
+      size = consume_as_integer(state, additional_info)
+
+      if size > 0
+        state.push_stack(self, Intermediate.new(size, []))
+      else
+        state.accept_value(self, [])
+      end
     end
 
     def self.accept(im_data, type, value)

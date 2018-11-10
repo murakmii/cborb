@@ -280,3 +280,13 @@ end
 generate "013" do |out|
   out << "\xBB\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
 end
+
+# empty map
+generate "014" do |out|
+  out << "\xA0"
+end
+
+# empty array
+generate "015" do |out|
+  out << "\x80"
+end

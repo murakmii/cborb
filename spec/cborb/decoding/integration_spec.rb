@@ -144,4 +144,12 @@ RSpec.describe "Integration" do
       expect { subject }.to raise_error(Cborb::InvalidByteSequenceError)
     end
   end
+
+  describe "014" do
+    it { is_expected.to eq({}) }
+  end
+
+  describe "015" do
+    it { is_expected.to eq [] }
+  end
 end

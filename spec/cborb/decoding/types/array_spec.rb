@@ -21,6 +21,16 @@ RSpec.describe Cborb::Decoding::Types::Array do
         expect(im.array).to be_empty
       end
     end
+
+    context "If size is 0" do
+      let(:additional_info) { 0 }
+
+      it "Calls #accept_value with empth array" do
+        allow(state).to receive(:accept_value)
+        subject
+        expect(state).to have_received(:accept_value).with(described_class, [])
+      end
+    end
   end
 
   describe ".accept" do
